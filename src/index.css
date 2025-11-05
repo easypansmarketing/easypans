@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 30 40% 98%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 150 35% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 30 60% 95%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 30 40% 94%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 150 45% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 30% 88%;
+    --input: 30 30% 88%;
+    --ring: 150 35% 45%;
+
+    --radius: 0.75rem;
+    
+    --hero-gradient: linear-gradient(135deg, hsl(150 45% 40%) 0%, hsl(150 35% 45%) 100%);
+    --card-shadow: 0 4px 20px -4px hsl(150 35% 45% / 0.15);
+    --hover-shadow: 0 8px 30px -6px hsl(150 35% 45% / 0.25);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 150 15% 8%;
+    --foreground: 30 40% 98%;
+
+    --card: 150 15% 12%;
+    --card-foreground: 30 40% 98%;
+
+    --popover: 150 15% 12%;
+    --popover-foreground: 30 40% 98%;
+
+    --primary: 150 40% 55%;
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 150 15% 18%;
+    --secondary-foreground: 30 40% 98%;
+
+    --muted: 150 15% 18%;
+    --muted-foreground: 30 20% 65%;
+
+    --accent: 150 45% 50%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 30 40% 98%;
+
+    --border: 150 15% 18%;
+    --input: 150 15% 18%;
+    --ring: 150 40% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-['Poppins',sans-serif];
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+/* --- Infinite seamless scroll using single image --- */
+.scroll-banner {
+  width: 200%;
+  height: 40px; /* 🔧 Adjust this for banner height */
+  background-repeat: repeat-x;
+  background-size: auto 100%; /* maintains height proportion */
+  background-position: 0 0;
+  animation: scroll-background 60s linear infinite;
+}
+
+/* Controls the seamless scroll movement */
+@keyframes scroll-background {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
