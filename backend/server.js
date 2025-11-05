@@ -21,40 +21,38 @@ mongoose.connect(process.env.MONGO_URI)
 const app = express();
 
 // --- CORS Configuration ---
-// --- UPDATED: Use the correct Vite localhost URL ---
-// --- ↓↓↓ MAKE SURE THIS MATCHES YOUR VITE TERMINAL OUTPUT ↓↓↓ ---
-const VITE_LOCALHOST_URL = 'http://localhost:8080'; // <-- Example: Update if yours is different (like :8080)
-// --- ↑↑↑ MAKE SURE THIS MATCHES YOUR VITE TERMINAL OUTPUT ↑↑↑ ---
-
-const IP_ADDRESS_URL = 'http://172.20.10.6:8080'; // <-- Your specific IP (Ensure port matches Vite if different)
+const VITE_LOCALHOST_URL = 'http://localhost:8080';
+const IP_ADDRESS_URL = 'http://172.20.10.6:8080';
 const FRONTEND_ENV_URL = process.env.FRONTEND_URL;
 
-// Create the list of allowed origins dynamically
 const allowedOrigins = [
-    VITE_LOCALHOST_URL, // Allow the standard localhost dev URL
-    IP_ADDRESS_URL     // Allow the specific IP address
+    VITE_LOCALHOST_URL,
+    IP_ADDRESS_URL
 ];
 
-// Add the URL from the .env file if it's different from the others
-if (FRONTEND_ENV_URL && allowedOrigins.indexOf(FRONTEND_ENV_URL) === -1) {
-    allowedOrigins.push(FRONTEND_ENV_URL);
+// --- CORRECTION FOR DEPLOYMENT ---
+// This allows Render to use a comma-separated list of URLs
+// (e.g., "https://easypans.vercel.app,https://www.easypans.com")
+if (FRONTEND_ENV_URL) {
+    FRONTEND_ENV_URL.split(',').forEach(origin => {
+        if (origin && allowedOrigins.indexOf(origin.trim()) === -1) {
+            allowedOrigins.push(origin.trim());
+        }
+    });
 }
+// --- END CORRECTION ---
 
-console.log("Allowed CORS Origins:", allowedOrigins); // Log allowed origins for debugging
+console.log("Allowed CORS Origins:", allowedOrigins);
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl, Postman)
-        if (!origin) return callback(null, true);
-
-        // Check if the incoming request origin is in our allowed list
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = `CORS Error: The origin "${origin}" is not allowed. Allowed origins: ${allowedOrigins.join(', ')}`;
-            console.error(msg); // Log the blocked origin and allowed list
-            return callback(new Error(msg), false); // Block the request
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            const msg = `CORS Error: The origin "${origin}" is not allowed.`;
+            console.error(msg);
+            callback(new Error(msg), false);
         }
-        // Origin is allowed
-        return callback(null, true);
     },
     methods: "GET,POST,PUT,DELETE",
     credentials: true
@@ -72,6 +70,12 @@ app.use('/api/recipes', recipeRoutes);
 
 
 // --- Production Build Static Serving (Optional but common) ---
+// --- CORRECTION: This entire block is commented out. ---
+// This block causes the 'ENOENT' error on Render because
+// this backend server is ONLY an API. Your Vercel frontend
+// will be responsible for serving the 'index.html' file.
+
+/* <-- Start of commented out block
 if (process.env.NODE_ENV === 'production') {
     const __dirname = path.resolve();
     // Assuming build output is 'frontend/dist' relative to backend root
@@ -81,10 +85,11 @@ if (process.env.NODE_ENV === 'production') {
         res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'))
     );
 } else {
+*/ // <-- End of commented out block
     app.get('/', (req, res) => {
         res.send('API is running in development mode...');
     });
-}
+// } // <-- This 'else' bracket is also commented out
 // --- End Production Build Static Serving ---
 
 
@@ -92,4 +97,3 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 // --- End Define Port and Start Server ---
-
