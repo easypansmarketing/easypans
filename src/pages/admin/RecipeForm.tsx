@@ -1,3 +1,7 @@
+// --- ADDED THIS LINE ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+// ---
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
@@ -103,7 +107,9 @@ const RecipeForm = () => {
     if (isEditing) {
       const fetchRecipe = async () => {
         try {
-          const response = await fetch(`http://localhost:5001/api/recipes/${id}`);
+          // --- THIS LINE WAS CORRECTED ---
+          const response = await fetch(`${API_BASE_URL}/api/recipes/${id}`);
+          // ---
           const data = await response.json();
 
           // --- UPDATED: Use the new parsing logic ---
@@ -252,7 +258,9 @@ const RecipeForm = () => {
 
 
     try {
-        const response = await fetch(isEditing ? `http://localhost:5001/api/recipes/${id}` : 'http://localhost:5001/api/recipes', {
+        // --- THIS LINE WAS CORRECTED ---
+        const response = await fetch(isEditing ? `${API_BASE_URL}/api/recipes/${id}` : `${API_BASE_URL}/api/recipes`, {
+        // ---
             method: isEditing ? 'PUT' : 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -418,4 +426,3 @@ const RecipeForm = () => {
 };
 
 export default RecipeForm;
-

@@ -1,3 +1,7 @@
+// --- ADDED THIS LINE ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+// ---
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
@@ -17,7 +21,9 @@ const AdminRecipes = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/recipes");
+        // --- THIS LINE WAS CORRECTED ---
+        const response = await fetch(`${API_BASE_URL}/api/recipes`);
+        // ---
         const data = await response.json();
         setRecipes(data);
       } catch (error) {
@@ -34,7 +40,9 @@ const AdminRecipes = () => {
     e.preventDefault();
     if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
-            const response = await fetch(`http://localhost:5001/api/recipes/${id}`, {
+            // --- THIS LINE WAS CORRECTED ---
+            const response = await fetch(`${API_BASE_URL}/api/recipes/${id}`, {
+            // ---
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${userInfo.token}`

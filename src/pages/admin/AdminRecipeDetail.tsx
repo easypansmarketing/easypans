@@ -1,3 +1,7 @@
+// --- ADDED THIS LINE ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+// ---
+
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -35,7 +39,9 @@ const AdminRecipeDetail = () => {
     const fetchRecipe = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5001/api/recipes/${id}`);
+        // --- THIS LINE WAS CORRECTED ---
+        const response = await fetch(`${API_BASE_URL}/api/recipes/${id}`);
+        // ---
         if (!response.ok) {
           throw new Error("Recipe not found");
         }
@@ -209,4 +215,3 @@ const AdminRecipeDetail = () => {
 };
 
 export default AdminRecipeDetail;
-
