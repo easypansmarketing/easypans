@@ -38,13 +38,17 @@ const RecipeDetail = () => {
   // Fetch specific recipe data
   useEffect(() => {
     const fetchRecipe = async () => {
-      const response = await fetch(`${API_BASE_URL}/api/recipes/${id}`);
+      // Removed the duplicate fetch that was here
       if (!id) return; // Don't fetch if ID is missing
 
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:5001/api/recipes/${id}`);
+        
+        // --- THIS IS THE CORRECTED LINE ---
+        const response = await fetch(`${API_BASE_URL}/api/recipes/${id}`);
+        // --- END CORRECTION ---
+
         if (!response.ok) {
           throw new Error("Recipe not found or failed to load");
         }
