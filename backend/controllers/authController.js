@@ -12,30 +12,43 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  // --- UPDATED: Wrap in try...catch and get 'phone' ---
+  try {
+    const { username, email, password, phone } = req.body;
 
-  const userExists = await User.findOne({ email });
+    // --- ADDED: Simple validation for phone (optional, but good practice) ---
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
 
-  if (userExists) {
-    return res.status(400).json({ message: 'User already exists' });
-  }
+    const userExists = await User.findOne({ email });
 
-  const user = await User.create({
-    username,
-    email,
-    password,
-  });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id),
+    const user = await User.create({
+      username,
+      email,
+      password,
+      phone, // --- ADDED: Pass phone to create user ---
     });
-  } else {
-    res.status(400).json({ message: 'Invalid user data' });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone, // --- ADDED: Return phone in response ---
+        role: user.role,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (error) {
+    // --- ADDED: Catch Mongoose validation errors (like invalid email) ---
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -52,6 +65,7 @@ const loginUser = async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      phone: user.phone, // --- ADDED: Return phone on login as well ---
       role: user.role,
       token: generateToken(user._id),
     });

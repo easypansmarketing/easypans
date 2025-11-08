@@ -11,16 +11,25 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    // --- ADDED: Mongoose validation for email format ---
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please fill a valid email address',
+    ],
   },
   password: {
+    type: String,
+    required: true,
+  },
+  // --- ADDED: Phone number field ---
+  phone: {
     type: String,
     required: true,
   },
   role: {
     type: String,
     enum: ['user', 'admin'],
-    // New users will now default to 'user'
-    default: 'user', 
+    default: 'user',
   },
 }, {
   timestamps: true,

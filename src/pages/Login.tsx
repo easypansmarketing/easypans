@@ -1,21 +1,22 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { useToast } from "../components/ui/use-toast";
-
-//const API_BASE_URL = "http://localhost:5001/api/auth";
+// --- FIXED: Use '@/' path aliases ---
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+// --- END FIX ---
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState(""); // --- ADDED: Phone state ---
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -24,9 +25,17 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    // const url = isLogin ? `http://localhost:5001/api/auth/login` : `http://localhost:5001/api/auth/register`; // Old
-    const url = isLogin ? `${API_BASE_URL}/api/auth/login` : `${API_BASE_URL}/api/auth/register`; // New
-    const body = isLogin ? { email, password } : { username, email, password };
+    // --- ADDED: Client-side email validation ---
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      setError("Invalid email ID. Please enter a valid email.");
+      return; // Stop the submission
+    }
+    // --- END: Client-side email validation ---
+
+    const url = isLogin ? `${API_BASE_URL}/api/auth/login` : `${API_BASE_URL}/api/auth/register`;
+    // --- UPDATED: Add phone to register body ---
+    const body = isLogin ? { email, password } : { username, email, password, phone };
 
     try {
       const response = await fetch(url, {
@@ -48,7 +57,6 @@ const Login = () => {
         description: isLogin ? "You have successfully logged in." : "Your account has been created.",
       });
 
-      // Redirect based on user role
       if (data.role === 'admin') {
         navigate('/admin');
       } else {
@@ -71,10 +79,18 @@ const Login = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                  </div>
+                  
+                  {/* --- ADDED: Phone Input Field --- */}
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                  </div>
+                </>
               )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -104,4 +120,3 @@ const Login = () => {
 };
 
 export default Login;
-
