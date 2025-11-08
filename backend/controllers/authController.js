@@ -26,9 +26,13 @@ const checkEmailDeliverability = async (email) => {
 
     const { data } = response;
     
-    // --- CHANGED: Check Apilayer's response fields ---
-    // We only want to allow emails where 'deliverable' is true and 'state' is 'deliverable'.
-    const isDeliverable = data.deliverable === true && data.state === 'deliverable';
+    // --- ADDED: This log will show up in your Render backend logs ---
+    console.log('Email Validation Response:', data);
+
+    // --- FIX: This logic is now more forgiving ---
+    // We check if the email server is valid AND if it's deliverable.
+    // This allows for "risky" but valid emails.
+    const isDeliverable = data.deliverable === true && data.is_smtp_valid === true;
 
     return {
       is_valid: isDeliverable,
