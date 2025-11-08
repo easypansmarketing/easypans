@@ -1,6 +1,6 @@
 const User = require('../models/userModel.js');
 const jwt = require('jsonwebtoken');
-const axios = require('axios'); // --- ADDED: To make API calls ---
+const axios = require('axios'); // To make API calls
 
 // Generates a JSON Web Token for a given user ID.
 const generateToken = (id) => {
@@ -9,41 +9,52 @@ const generateToken = (id) => {
   });
 };
 
-// --- UPDATED FUNCTION: To use Apilayer Email Verification ---
+// --- UPDATED FUNCTION: Added timeout and relaxed validation logic ---
 const checkEmailDeliverability = async (email) => {
   try {
-    const apiKey = process.env.APILAYER_API_KEY; // --- CHANGED: Using new key ---
-    if (!apiKey || apiKey === 'YOUR_APILAYER_KEY_HERE') {
-      console.warn('Email validation API key not set. Skipping deliverability check.');
-      // If no key, just assume it's valid to not block development.
-      return { is_valid: true, state: 'deliverable' };
+    const apiKey = process.env.APILAYER_API_KEY;
+    if (!apiKey || apiKey === 'YOUR_APILAYER_KEY_HERE' || apiKey === 'SE9vsRLdU4E1toJNoLHZFMLikFnFfKyK') {
+      console.warn('Email validation API key not set or is placeholder. Skipping deliverability check.');
+      return { is_valid: true, state: 'skipped' };
     }
 
     const response = await axios.get(
       `https://api.apilayer.com/email_verification/check?email=${email}`,
-      { headers: { apikey: apiKey } } // --- CHANGED: Updated endpoint and headers ---
+      {
+        headers: { apikey: apiKey },
+        timeout: 5000 // --- ADDED: 5-second timeout to prevent hangs ---
+      }
     );
 
     const { data } = response;
     
-    // --- ADDED: This log will show up in your Render backend logs ---
     console.log('Email Validation Response:', data);
 
-    // --- FIX: This logic is now more forgiving ---
-    // We check if the email server is valid AND if it's deliverable.
-    // This allows for "risky" but valid emails.
-    const isDeliverable = data.deliverable === true && data.is_smtp_valid === true;
+    // --- FIX: Relaxed logic ---
+    // We will now allow emails unless they are *explicitly* undeliverable.
+    // This allows "risky" and "unknown" states to pass.
+    const isInvalid = data.deliverable === false || data.state === 'undeliverable';
 
     return {
-      is_valid: isDeliverable,
-      message: !isDeliverable
-        ? 'Invalid email ID. Please check for typos or use a different email.' 
+      is_valid: !isInvalid,
+      message: isInvalid
+        ? 'Invalid email ID. This email appears to be undeliverable.' 
         : 'Valid email.',
     };
   } catch (error) {
-    console.error('Email validation API error:', error.message);
-    // If the API fails, we'll cautiously allow registration to not block users.
-    return { is_valid: true, state: 'unknown' };
+    // --- UPDATED: Better error logging ---
+    if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          console.error('Email validation API timed out.');
+        } else {
+          console.error('Axios error validating email:', error.response?.data || error.message);
+        }
+    } else {
+      console.error('Email validation API error:', error.message);
+    }
+    // If the API fails for any reason (timeout, bad key, quota),
+    // we will cautiously allow registration to proceed.
+    return { is_valid: true, state: 'unknown_api_failure' };
   }
 };
 // --- END UPDATED FUNCTION ---
@@ -101,7 +112,8 @@ const registerUser = async (req, res) => {
     }
   } catch (error) {
     // This will catch any other Mongoose errors (like duplicate username)
-    res.status(400).json({ message: error.message });
+    console.error("Error in registerUser:", error); // Added for more debugging
+    res.status(400).json({ message: error.message || "An unexpected error occurred." });
   }
 };
 
@@ -109,21 +121,26 @@ const registerUser = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+      const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+      const user = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+      if (user && (await user.matchPassword(password))) {
+        res.json({
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          token: generateToken(user._id),
+        });
+      } else {
+        res.status(401).json({ message: 'Invalid email or password' });
+      }
+  } catch (error) {
+     console.error("Error in loginUser:", error);
+     res.status(500).json({ message: "Server error during login." });
   }
 };
 
