@@ -9,11 +9,11 @@ const generateToken = (id) => {
   });
 };
 
-// --- UPDATED FUNCTION: Added timeout and relaxed validation logic ---
+// --- UPDATED FUNCTION: Using 'smtp_check' for validation ---
 const checkEmailDeliverability = async (email) => {
   try {
     const apiKey = process.env.APILAYER_API_KEY;
-    if (!apiKey || apiKey === 'YOUR_APILAYER_KEY_HERE' || apiKey === 'SE9vsRLdU4E1toJNoLHZFMLikFnFfKyK') {
+    if (!apiKey || apiKey === 'YOUR_APILAYER_KEY_HERE') {
       console.warn('Email validation API key not set or is placeholder. Skipping deliverability check.');
       return { is_valid: true, state: 'skipped' };
     }
@@ -22,7 +22,7 @@ const checkEmailDeliverability = async (email) => {
       `https://api.apilayer.com/email_verification/check?email=${email}`,
       {
         headers: { apikey: apiKey },
-        timeout: 5000 // --- ADDED: 5-second timeout to prevent hangs ---
+        timeout: 5000 // 5-second timeout
       }
     );
 
@@ -30,19 +30,17 @@ const checkEmailDeliverability = async (email) => {
     
     console.log('Email Validation Response:', data);
 
-    // --- FIX: Relaxed logic ---
-    // We will now allow emails unless they are *explicitly* undeliverable.
-    // This allows "risky" and "unknown" states to pass.
-    const isInvalid = data.deliverable === false || data.state === 'undeliverable';
+    // --- FIX: Logic is now based on 'smtp_check' ---
+    // This field directly confirms if the email exists on the server.
+    const isInvalid = data.smtp_check === false;
 
     return {
       is_valid: !isInvalid,
       message: isInvalid
-        ? 'Invalid email ID. This email appears to be undeliverable.' 
+        ? 'Invalid email ID. This email address does not exist.' 
         : 'Valid email.',
     };
   } catch (error) {
-    // --- UPDATED: Better error logging ---
     if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNABORTED') {
           console.error('Email validation API timed out.');
