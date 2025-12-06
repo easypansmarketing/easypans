@@ -21,8 +21,8 @@ mongoose.connect(process.env.MONGO_URI)
 const app = express();
 
 // --- CORS Configuration ---
-const VITE_LOCALHOST_URL = 'http://localhost:8080';
-const IP_ADDRESS_URL = 'http://172.20.10.6:8080';
+const VITE_LOCALHOST_URL = 'http://localhost:8081';
+const IP_ADDRESS_URL = 'http://172.20.10.6:8081';
 const FRONTEND_ENV_URL = process.env.FRONTEND_URL;
 
 const allowedOrigins = [
