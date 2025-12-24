@@ -110,7 +110,7 @@ All colors MUST be HSL.
   background-repeat: repeat-x;
   background-size: contain;
   background-position: 0 0;
-  animation: scroll-background 25s linear infinite;
+  animation: scroll-background 45s linear infinite;
 }
 
 /* KEYFRAMES */
@@ -133,8 +133,18 @@ All colors MUST be HSL.
   }
 }
 
-.scroll-banner:hover {
-  animation-play-state: paused;
+ 
+ /* hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
+.swiper-slide-active {
+  transform: scale(1.08) !important;
+  z-index: 10;
+}
  

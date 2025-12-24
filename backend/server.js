@@ -1,8 +1,11 @@
+const dotenv = require ('dotenv');
+dotenv.config();
+
 // --- ADDED: Make sure Express is required ---
 const express = require('express');
 // ... other imports like mongoose, path etc. should be here ...
 const cors = require('cors');
-const dotenv = require('dotenv');
+
 const path = require('path'); // Often needed for production builds
 const mongoose = require('mongoose'); // Example
 
@@ -10,7 +13,10 @@ const mongoose = require('mongoose'); // Example
 const authRoutes = require('./routes/authRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 
-dotenv.config();
+
+
+console.log("MAIL_USER:", process.env.MAIL_USER);
+console.log("MAIL_PASS:", process.env.MAIL_PASS ? "LOADED" : "NOT LOADED");
 
 // --- Database Connection (Example - adjust if needed) ---
 mongoose.connect(process.env.MONGO_URI)
@@ -97,3 +103,20 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 // --- End Define Port and Start Server ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

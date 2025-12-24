@@ -41,7 +41,7 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 font-sans">
       <div className="container mx-auto px-4 md:px-6">
         <div className="relative flex h-16 items-center justify-between">
           <div className="md:hidden">
@@ -61,9 +61,9 @@ const Header = () => {
                   <Link to="/recipes" className="text-muted-foreground hover:text-foreground">Recipe</Link>
                   <Link to="/#about" className="text-muted-foreground hover:text-foreground">About Us</Link>
                   {userInfo ? (
-                     <Button onClick={handleLogout} className="font-medium w-full mt-4">Logout</Button>
+                     <Button onClick={handleLogout} className="font-medium w-full mt-4 ">Logout</Button>
                   ) : (
-                    <Button asChild className="font-medium w-full mt-4 "><Link to="/login">Login</Link></Button>
+                    <Button asChild className="font-medium w-full mt-4  "><Link to="/login">Login</Link></Button>
                   )}
                 </nav>
               </SheetContent>
@@ -104,9 +104,9 @@ const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
+                    <Avatar className="h-10 w-10 ">
                       <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${userInfo.username}`} alt={userInfo.username} />
-                      <AvatarFallback>{getInitials(userInfo.username)}</AvatarFallback>
+                      <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-green-700 text-white font-semibold">{getInitials(userInfo.username)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -118,7 +118,7 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild size="sm" className="font-medium text-lg">
+              <Button asChild size="sm" className="font-medium text-lg bg-emerald-600">
                 <Link to="/login">Login</Link>
               </Button>
             )}

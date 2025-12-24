@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Recipes from "./pages/Recipes";
 import RecipeDetail from "./pages/RecipeDetail";
 import Login from "./pages/Login";
+import VerifyOtp from "./pages/verifyOtp";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -35,6 +36,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+
           
           {/* --- Protected User Route (for recipe details) --- */}
           <Route element={<ProtectedRoute />}>

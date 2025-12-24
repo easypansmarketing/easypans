@@ -12,10 +12,14 @@ interface RecipeCardProps {
 }
 
 const RecipeCard = ({ id, title, image, cookTime, serves, description }: RecipeCardProps) => {
+
+
+  
   return (
     <Link to={`/recipe/${id}`}>
   <Card className="overflow-hidden rounded-xl transition-all duration-300 hover:shadow-[var(--hover-shadow)] cursor-pointer group">
     <div className="aspect-[4/3] overflow-hidden">
+    
       <img
         src={image}
         alt={title}

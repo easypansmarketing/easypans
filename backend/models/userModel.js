@@ -31,6 +31,19 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+   // 🔐 EMAIL OTP FIELDS (ADDED)
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  otp: {
+    type: String,
+  },
+
+  otpExpiresAt: {
+    type: Date,
+  },
 }, {
   timestamps: true,
 });
