@@ -59,6 +59,10 @@ const Header = () => {
                   </Link>
                   <Link to="/" className="text-muted-foreground hover:text-foreground">Home</Link>
                   <Link to="/recipes" className="text-muted-foreground hover:text-foreground">Recipe</Link>
+                  
+                  {/* 👇 NEW MOBILE LINK */}
+                  <Link to="/ai-chef" className="text-yellow-600 font-semibold hover:text-yellow-700">✨ AI Chef</Link>
+                  
                   <Link to="/#about" className="text-muted-foreground hover:text-foreground">About Us</Link>
                   {userInfo ? (
                      <Button onClick={handleLogout} className="font-medium w-full mt-4">Logout</Button>
@@ -78,6 +82,10 @@ const Header = () => {
             <nav className="flex items-center gap-8">
               <Link to="/" className={`text-lg font-medium transition-colors hover:text-primary ${isActive("/") && !isActive("/recipes") ? "text-primary" : "text-muted-foreground"}`}>Home</Link>
               <Link to="/recipes" className={`text-lg font-medium transition-colors hover:text-primary ${isActive("/recipes") ? "text-primary" : "text-muted-foreground"}`}>Recipe</Link>
+              
+              {/* 👇 NEW DESKTOP LINK */}
+              <Link to="/ai-chef" className="text-lg font-bold text-yellow-600 hover:text-yellow-700 transition-colors">✨ AI Chef</Link>
+              
               <Link to="/#about" className="text-lg font-medium text-muted-foreground hover:text-primary">About Us</Link>
             </nav>
             {userInfo ? (
@@ -110,4 +118,3 @@ const Header = () => {
 };
 
 export default Header;
-
