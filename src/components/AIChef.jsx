@@ -1,25 +1,26 @@
-import { useState } from 'react';
-import axios from 'axios'; // Make sure you have axios installed
+import { useState } from "react";
+import axios from "axios"; // Make sure you have axios installed
 
 const AIChef = () => {
-  const [ingredients, setIngredients] = useState('');
+  const [ingredients, setIngredients] = useState("");
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Replace with your actual Render Backend URL
-  const BACKEND_URL = "[https://your-easypans-backend.onrender.com](https://your-easypans-backend.onrender.com)"; 
+  const BACKEND_URL =
+    "[https://your-easypans-backend.onrender.com](https://your-easypans-backend.onrender.com)";
 
   const handleGenerate = async () => {
     if (!ingredients) return alert("Please enter ingredients!");
-    
+
     setLoading(true);
     setRecipe(null);
 
     try {
       const response = await axios.post(`${BACKEND_URL}/api/ai/generate`, {
-        ingredients: ingredients
+        ingredients: ingredients,
       });
-      
+
       setRecipe(response.data);
     } catch (error) {
       console.error(error);
@@ -47,7 +48,9 @@ const AIChef = () => {
           <p>{recipe.description}</p>
           <h4>Instructions:</h4>
           <ul>
-            {recipe.steps.map((step, idx) => <li key={idx}>{step}</li>)}
+            {recipe.steps.map((step, idx) => (
+              <li key={idx}>{step}</li>
+            ))}
           </ul>
         </div>
       )}

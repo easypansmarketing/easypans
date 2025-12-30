@@ -22,8 +22,8 @@ const app = express();
 // --- CORS Configuration ---
 // This allows your frontend (running on these URLs) to talk to this backend
 const allowedOrigins = [
-    'http://localhost:8080',      // Laptop (Localhost)
-    'http://172.20.10.6:8080',    // Phone (Network IP) - Update if your IP changes!
+    'http://localhost:8081',      // Laptop (Localhost)
+    'http://172.20.10.6:8081',    // Phone (Network IP) - Update if your IP changes!
     'http://localhost:5173'       // Vite default port (backup)
 ];
 
