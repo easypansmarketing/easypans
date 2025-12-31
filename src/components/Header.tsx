@@ -59,6 +59,9 @@ const Header = () => {
                   </Link>
                   <Link to="/" className="text-muted-foreground hover:text-foreground">Home</Link>
                   <Link to="/recipes" className="text-muted-foreground hover:text-foreground">Recipe</Link>
+
+                   {/* 👇 NEW MOBILE LINK */}
+                  <Link to="/ai-chef" className="text-emerald-500 font-semibold hover:text-emerald-800">✨ AI Chef</Link>
                   <Link to="/#about" className="text-muted-foreground hover:text-foreground">About Us</Link>
                   {userInfo ? (
                      <Button onClick={handleLogout} className="font-medium w-full mt-4 ">Logout</Button>
@@ -91,6 +94,9 @@ const Header = () => {
               >
                 Recipe
               </Link>
+
+               {/* 👇 NEW MOBILE LINK */}
+                  <Link to="/ai-chef" className="text-emerald-500 font-semibold hover:text-emerald-800">✨ AI Chef</Link>
 
               <Link
                 to="/#about"
