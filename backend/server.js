@@ -24,7 +24,8 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:8081',      // Laptop (Localhost)
     'http://172.20.10.6:8081',    // Phone (Network IP) - Update if your IP changes!
-    'http://localhost:5173'       // Vite default port (backup)
+    'http://localhost:5173',      // Vite default port (backup)
+    'http://localhost:8080'       // Additional frontend port
 ];
 
 console.log("Allowed CORS Origins:", allowedOrigins);
