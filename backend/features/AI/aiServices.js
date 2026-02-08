@@ -83,4 +83,28 @@ const identifyIngredientsLogic = async (fileBuffer, mimeType) => {
   return text.trim();
 };
 
-module.exports = { generateRecipeLogic, identifyIngredientsLogic };
+// --- ROUTE HANDLERS ---
+const generateRecipe = async (req, res) => {
+  try {
+    const { ingredients } = req.body;
+    if (!ingredients) return res.status(400).json({ error: "Ingredients required" });
+    
+    const recipe = await generateRecipeLogic(ingredients);
+    res.json(recipe);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const identifyIngredients = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "Image required" });
+    
+    const ingredients = await identifyIngredientsLogic(req.file.buffer, req.file.mimetype);
+    res.json({ ingredients });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { generateRecipe, identifyIngredients, generateRecipeLogic, identifyIngredientsLogic };

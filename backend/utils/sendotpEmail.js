@@ -1,12 +1,10 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  
   service: "gmail",
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
-    
   },
 });
 
@@ -14,14 +12,15 @@ const sendOtpEmail = async (email, otp) => {
   console.log(process.env.MAIL_USER, process.env.MAIL_PASS);
 
   await transporter.sendMail({
-    from: `"EasyPans" <${process.env.MAIL_USER}>`,
+    from: `"OTP Mailer" <${process.env.MAIL_USER}>`,
     to: email,
-    subject: "Verify your EasyPans account",
+    subject: "Your Easypans Registration OTP",
     html: `
-      <h2>Your OTP: ${otp}</h2>
-      <p>Valid for 5 minutes.</p>
+      <p>Your OTP for Easypans Registration is: <strong>${otp}</strong></p>
+      <p>This OTP is valid for the next 10 minutes and can be used only once. Please do not share it with anyone.</p>
+      <p>Warm regards,<br>Team Easypans</p>
     `,
   });
 };
 
-export default sendOtpEmail;
+module.exports = sendOtpEmail;

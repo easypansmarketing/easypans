@@ -146,11 +146,11 @@ const loginUser = async (req, res) => {
 module.exports = { registerUser, loginUser };
 */
 
-import User from "../models/userModel.js";
-import jwt from "jsonwebtoken";
-import axios from "axios";
-import { generateOtp, hashOtp } from "../utils/otp.js";
-import sendOtpEmail from "../utils/sendotpEmail.js";
+const User = require('../models/userModel.js');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
+const { generateOtp, hashOtp } = require('../utils/otp.js');
+const sendOtpEmail = require('../utils/sendotpEmail.js');
 
 
 
@@ -354,5 +354,5 @@ const verifyOtp = async (req, res) => {
 };
 
 
-export { registerUser, loginUser, verifyOtp };
+module.exports = { registerUser, loginUser, verifyOtp };
 
