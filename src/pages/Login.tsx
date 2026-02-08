@@ -240,7 +240,7 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Header from "@/components/Header";
@@ -259,9 +259,15 @@ import { useToast } from "@/components/ui/use-toast";
 import logo from "@/assets/logo.png";
 import IngradientBG from "../assets/Ingradient-Background.webp";
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [step, setStep] = useState<"form" | "otp">("form");
+  const [step, setStep] = useState<"form" | "otp" | "forgot">("form");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -274,14 +280,109 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Initialize Google Sign-In
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+      });
+    }
+  }, []);
+
+  // Handle Google Sign-In response
+  const handleGoogleResponse = async (response: any) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: response.credential }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      toast({
+        title: "Login successful",
+        description: "Welcome to EasyPans!",
+      });
+      navigate(data.role === "admin" ? "/admin" : "/recipes");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  // Validate email format
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validate phone number (exactly 10 digits)
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // Google Sign-In
+  const handleGoogleSignIn = () => {
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin-button'),
+        { theme: 'outline', size: 'large', width: '100%' }
+      );
+    } else {
+      console.error('Google Sign-In not loaded');
+      setError("Google Sign-In not available. Please try again.");
+    }
+  };
+
+  // Forgot Password
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      toast({
+        title: "Reset link sent",
+        description: "Check your email for password reset instructions",
+      });
+      setStep("form");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   // ---------------- LOGIN / SIGNUP ----------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email)) {
-      setError("Invalid email address");
+    // Validate email format
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    // Validate phone for signup
+    if (!isLogin && !validatePhone(phone)) {
+      setError("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -374,6 +475,8 @@ const Login = () => {
                 ? "Welcome back to EasyPans"
                 : step === "otp"
                 ? "Verify your email"
+                : step === "forgot"
+                ? "Reset your password"
                 : "Create your EasyPans account"}
             </CardTitle>
 
@@ -382,99 +485,191 @@ const Login = () => {
                 ? "Login to manage your meals effortlessly"
                 : step === "otp"
                 ? "Enter the OTP sent to your email"
+                : step === "forgot"
+                ? "Enter your email to receive reset instructions"
                 : "Sign up and start ordering smarter"}
             </p>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* SIGNUP EXTRA FIELDS */}
-              {!isLogin && step === "form" && (
-                <>
-                  <div>
-                    <Label>Username</Label>
-                    <Input
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Phone Number</Label>
-                    <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* EMAIL */}
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={email}
-                  disabled={step === "otp"}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-
-              {/* PASSWORD */}
-              {step === "form" && (
+            {step === "forgot" ? (
+              <div className="space-y-4">
                 <div>
-                  <Label>Password</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </div>
-              )}
-
-              {/* OTP */}
-              {step === "otp" && (
-                <div>
-                  <Label>Enter OTP</Label>
-                  <Input
-                    value={otp}
-                    placeholder="6-digit OTP"
-                    onChange={(e) => setOtp(e.target.value)}
-                  />
-                </div>
-              )}
-
-              {error && <p className="text-sm text-red-500">{error}</p>}
-
-              {step === "form" ? (
-                <Button type="submit" className="w-full rounded-xl">
-                  {isLogin ? "Login" : "Sign Up"}
-                </Button>
-              ) : (
+                {error && <p className="text-sm text-red-500">{error}</p>}
                 <Button
                   type="button"
-                  onClick={handleVerifyOtp}
-                  className="w-full rounded-xl bg-emerald-600"
+                  onClick={handleForgotPassword}
+                  className="w-full rounded-xl"
                 >
-                  Verify OTP
+                  Send Reset Link
                 </Button>
-              )}
-            </form>
-
-            {step === "form" && (
-              <div className="mt-6 text-center text-sm">
-                {isLogin ? "New to EasyPans?" : "Already have an account?"}{" "}
-                <button
+                <Button
                   type="button"
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setError("");
-                  }}
-                  className="font-medium text-emerald-600 hover:underline"
+                  variant="outline"
+                  onClick={() => setStep("form")}
+                  className="w-full rounded-xl"
                 >
-                  {isLogin ? "Create account" : "Login"}
-                </button>
+                  Back to Login
+                </Button>
               </div>
+            ) : (
+              <>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* SIGNUP EXTRA FIELDS */}
+                  {!isLogin && step === "form" && (
+                    <>
+                      <div>
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="phone">Phone Number *</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                          placeholder="10-digit phone number"
+                          maxLength={10}
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* EMAIL */}
+                  <div>
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      disabled={step === "otp"}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* PASSWORD */}
+                  {step === "form" && (
+                    <div>
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {/* OTP */}
+                  {step === "otp" && (
+                    <div>
+                      <Label htmlFor="otp">Enter OTP</Label>
+                      <Input
+                        id="otp"
+                        value={otp}
+                        placeholder="6-digit OTP"
+                        onChange={(e) => setOtp(e.target.value)}
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+
+                  {step === "form" ? (
+                    <Button type="submit" className="w-full rounded-xl">
+                      {isLogin ? "Login" : "Sign Up"}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      className="w-full rounded-xl bg-emerald-600"
+                    >
+                      Verify OTP
+                    </Button>
+                  )}
+                </form>
+
+                {/* Google Sign-In */}
+                {step === "form" && (
+                  <>
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or</span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGoogleSignIn}
+                      className="w-full rounded-xl"
+                      id="google-signin-button"
+                    >
+                      Sign {isLogin ? "in" : "up"} with Google
+                    </Button>
+                  </>
+                )}
+
+                {/* Navigation Links */}
+                {step === "form" && (
+                  <div className="space-y-2 text-center text-sm">
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setStep("forgot")}
+                        className="text-emerald-600 hover:underline block w-full"
+                      >
+                        Forgot Password?
+                      </button>
+                    )}
+                    <div>
+                      {isLogin ? "New to EasyPans?" : "Already have an account?"}{" "}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLogin(!isLogin);
+                          setError("");
+                        }}
+                        className="font-medium text-emerald-600 hover:underline"
+                      >
+                        {isLogin ? "Create account" : "Login"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Support Contact */}
+                <div className="text-center text-xs text-muted-foreground mt-4">
+                  Need help? Contact us at{" "}
+                  <a href="mailto:support@easypans.com" className="text-emerald-600 hover:underline">
+                    support@easypans.com
+                  </a>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

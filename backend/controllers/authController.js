@@ -149,8 +149,11 @@ module.exports = { registerUser, loginUser };
 const User = require('../models/userModel.js');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const { OAuth2Client } = require('google-auth-library');
 const { generateOtp, hashOtp } = require('../utils/otp.js');
 const sendOtpEmail = require('../utils/sendotpEmail.js');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
 
@@ -221,15 +224,22 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password, phone } = req.body;
 
+    // Validate required fields
     if (!phone) {
       return res.status(400).json({ message: "Phone number is required" });
     }
 
+    // Validate phone number (exactly 10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+    }
+
     // --- STEP 1: Check if email format is valid (from Mongoose model) ---
     // This is a fast, local check.
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email ID format." });
+      return res.status(400).json({ message: "Invalid email format" });
     }
 
     // --- STEP 2: Check if user already exists ---
@@ -354,5 +364,75 @@ const verifyOtp = async (req, res) => {
 };
 
 
-module.exports = { registerUser, loginUser, verifyOtp };
+// @desc    Forgot Password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const otp = generateOtp();
+    const hashedOtp = hashOtp(otp);
+
+    user.otp = hashedOtp;
+    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 min
+    await user.save();
+
+    await sendOtpEmail(user.email, otp, "Password Reset");
+
+    res.json({ message: "Password reset OTP sent to your email" });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Failed to send reset email" });
+  }
+};
+
+// @desc    Google OAuth Login
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user with Google data
+      user = await User.create({
+        username: name,
+        email,
+        password: 'google_oauth_' + googleId, // Placeholder password
+        phone: '0000000000', // Placeholder phone
+        isVerified: true, // Google accounts are pre-verified
+      });
+    }
+
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(400).json({ message: 'Google authentication failed' });
+  }
+};
+
+module.exports = { registerUser, loginUser, verifyOtp, forgotPassword, googleAuth };
 

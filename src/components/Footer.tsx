@@ -82,7 +82,7 @@ const Footer = () => {
             <ul className="space-y-5 text-white/75">
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-white/80" />
-                <span>easypans.marketing@gmail.com</span>
+                <span>support@easypans.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-white/80" />
@@ -97,7 +97,7 @@ const Footer = () => {
         <div className="relative mt-14 pt-6 text-center">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-24 bg-white/30" />
           <p className="text-white/60 text-sm tracking-wide">
-            © 2025 EasyPans. All rights reserved.
+            © 2026 EasyPans. All rights reserved.
           </p>
         </div>
 
