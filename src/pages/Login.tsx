@@ -257,7 +257,6 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 import logo from "@/assets/logo.png";
-import IngradientBG from "@/assets/Ingradient-background.webp";
 
 declare global {
   interface Window {
@@ -462,8 +461,7 @@ const Login = () => {
 
       <main className="relative flex-1 flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-lime-50 py-12">
        <div
-                className="absolute inset-0  bg-[length:auto_100%] md:bg-[length:120%_100%] bg-top bg-no-repeat opacity-10 pointer-events-none"
-               style={{ backgroundImage: `url(${IngradientBG})` }}
+                className="absolute inset-0 bg-gradient-to-br from-emerald-100/50 to-lime-100/50 pointer-events-none"
             />
 
         <Card className="relative z-10 w-full max-w-md rounded-2xl shadow-2xl border-0">

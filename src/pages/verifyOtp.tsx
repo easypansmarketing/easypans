@@ -53,7 +53,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/logo.png";
-import IngradientBG from "@/assets/Ingradient-background.webp";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -105,8 +104,7 @@ const VerifyOtp = () => {
       <Header />
     <main className="relative flex-1 flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-lime-50 py-12">
        <div
-              className="absolute inset-0  bg-[length:auto_100%] md:bg-[length:120%_100%] bg-top bg-no-repeat opacity-10 pointer-events-none"
-              style={{ backgroundImage: `url(${IngradientBG})` }}
+              className="absolute inset-0 bg-gradient-to-br from-emerald-100/50 to-lime-100/50 pointer-events-none"
             />
 
       <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-200/40 blur-3xl" />
