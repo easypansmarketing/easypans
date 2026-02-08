@@ -37,7 +37,8 @@ const FRONTEND_ENV_URL = process.env.FRONTEND_URL;
 const allowedOrigins = [
     VITE_LOCALHOST_URL,
     VITE_LOCALHOST_8080,
-    IP_ADDRESS_URL
+    IP_ADDRESS_URL,
+    'https://easypans-git-website-dev-easypans-projects.vercel.app'
 ];
 
 // --- CORRECTION FOR DEPLOYMENT ---
