@@ -257,7 +257,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 import logo from "@/assets/logo.png";
-import IngradientBG from "../assets/Ingradient-Background.webp";
+import IngradientBG from "../assets/Ingradient-background.webp";
 
 declare global {
   interface Window {
