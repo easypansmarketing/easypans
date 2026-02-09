@@ -23,7 +23,10 @@ console.log("MAIL_PASS:", process.env.MAIL_PASS ? "LOADED" : "NOT LOADED");
 // --- Database Connection (Example - adjust if needed) ---
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB Connection Error:', err));
+  .catch(err => {
+    console.error('MongoDB Connection Error:', err);
+    console.error('MONGO_URI:', process.env.MONGO_URI ? 'SET' : 'NOT SET');
+  });
 // --- End Database Connection Example ---
 
 const app = express();
