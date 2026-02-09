@@ -39,7 +39,8 @@ const allowedOrigins = [
     VITE_LOCALHOST_8080,
     IP_ADDRESS_URL,
     'https://easypans-git-website-dev-easypans-projects.vercel.app',
-    'https://easypans-l3zh42ekc-easypans-projects.vercel.app'
+    'https://easypans-l3zh42ekc-easypans-projects.vercel.app',
+    'https://easypans.vercel.app'
 ];
 
 // --- CORRECTION FOR DEPLOYMENT ---
