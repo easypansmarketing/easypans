@@ -40,6 +40,7 @@ const allowedOrigins = [
     IP_ADDRESS_URL,
     'https://easypans-git-website-dev-easypans-projects.vercel.app',
     'https://easypans-l3zh42ekc-easypans-projects.vercel.app',
+    'https://easypans-8apmoy9vo-easypans-projects.vercel.app',
     'https://easypans.vercel.app'
 ];
 
