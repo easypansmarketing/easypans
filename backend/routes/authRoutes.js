@@ -1,19 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, verifyOtp, forgotPassword, googleAuth } = require('../controllers/authController.js');
+
+// Registration + Login + Email Verification
+const { registerUser, loginUser, verifyOtp } = require('../controllers/auth/auth.controller.js');
+
+// Password reset
+const { forgotPassword, resetPassword } = require('../controllers/auth/password.controller.js');
+
+// Google OAuth
+const { googleAuth } = require('../controllers/auth/google.controller.js');
 
 // Route for user registration
 router.post('/register', registerUser);
 
+// Verify Email OTP
 router.post('/verify-otp', verifyOtp);
 
-// Route for user login
+// Login
 router.post('/login', loginUser);
 
-// Route for forgot password
+// Forgot password
 router.post('/forgot-password', forgotPassword);
 
-// Route for Google OAuth
+// 🔥 THIS WAS MISSING
+router.post('/reset-password', resetPassword);
+
+// Google OAuth
 router.post('/google', googleAuth);
 
 module.exports = router;

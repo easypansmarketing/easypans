@@ -1,0 +1,88 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 3rem 1rem;
+  background: linear-gradient(to bottom right, #ecfdf5, white, #f7fee7);
+}
+
+.backgroundOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(167, 243, 208, 0.5),
+    rgba(217, 249, 157, 0.5)
+  );
+  pointer-events: none;
+}
+
+.cardWrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  height: 48px;
+  width: 112px;
+  margin: 0 auto;
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+.divider {
+  position: relative;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.divider span {
+  position: relative;
+  background: white;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.supportText {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 1rem;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #059669;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
